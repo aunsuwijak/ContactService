@@ -8,7 +8,7 @@ import org.glassfish.jersey.server.ServerProperties;
 /**
  * ContactMain - contains main class and start the server.
  * 
- * @author suwijakchaipipat
+ * @author Suwijak Chaipipat 5510545046
  * @version 16.9.2014
  */
 
@@ -16,14 +16,21 @@ public class ContactMain {
 
 	private static final int PORT = 8080;
 	
-	/* Start the server. */
-	public static void startServer() throws Exception {
+	private static Server server = null;
+	
+	/* Start the server with default port. */
+	public static String startServer() throws Exception {
 		int port = PORT;
-		Server server = new Server( port );
+		return startServer( port );
+	}
+	
+	/* Start the server. */
+	public static String startServer(int port) throws Exception {
+		server = new Server( port );
 		
 		ServletContextHandler context = new ServletContextHandler( ServletContextHandler.SESSIONS );
 		
-		context.setContextPath("/contacts");
+		context.setContextPath("");
 		
 		ServletHolder holder = new ServletHolder( org.glassfish.jersey.servlet.ServletContainer.class );
 		
@@ -35,11 +42,16 @@ public class ContactMain {
 		System.out.println("Starting Jetty server on port " + port);
 		server.start();
 		
-		System.out.println("Server started.  Press ENTER to stop it.");
-		System.in.read();
+		return server.getURI().toString();
+	}
+	
+	/* Start the server with default port. */
+	public static void stopServer() throws Exception {
 		System.out.println("Stopping server.");
 		server.stop();
 	}
+	
+	
 	
 	public static void main(String [] args) throws Exception {
 		startServer();

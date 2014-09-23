@@ -1,9 +1,11 @@
 package contact.entity;
 import java.io.Serializable;
 
+import javax.persistence.Entity;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -11,6 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * title is text to display for this contact in a list of contacts,
  * such as a nickname or company name.
  */
+@Entity
 @XmlRootElement(name="contact")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Contact implements Serializable {
@@ -18,33 +21,25 @@ public class Contact implements Serializable {
 
 	@XmlAttribute
 	private long id;
+	
+	@XmlElement
 	private String name;
 	private String title;
 	private String email;
-	/** URL of photo */
-	private String photoUrl;
+	private String phoneNum;
 	
 	public Contact() { }
 	
-	public Contact(String title, String name, String email ) {
+	public Contact(String title, String name, String email , String phoneNum ) {
 		this.title = title;
 		this.name = name;
 		this.email = email;
-		this.photoUrl = "";
+		this.phoneNum = phoneNum;
 	}
 
 	public Contact(long id) {
 		this.id = id;
 	}
-
-	public String getPhotoUrl() {
-		return photoUrl;
-	}
-
-	public void setPhotoUrl(String photo) {
-		this.photoUrl = photo;
-	}
-
   
 	public String getName() {
 		return name;
@@ -69,7 +64,15 @@ public class Contact implements Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	
+	public String getPhoneNum() {
+		return phoneNum;
+	}
 
+	public void setPhoneNum(String phoneNum) {
+		this.phoneNum = phoneNum;
+	}
+	
 	public long getId() {
 		return id;
 	}
@@ -103,11 +106,11 @@ public class Contact implements Serializable {
 		if (update.getId() != 0 && update.getId() != this.getId() )
 			throw new IllegalArgumentException("Update contact must have same id as contact to update");
 		// Since title is used to display contacts, don't allow empty title
-		if (! isEmpty( update.getTitle()) ) this.setTitle(update.getTitle()); // empty nickname is ok
+		this.setTitle(update.getTitle()); // empty nickname is ok
 		// other attributes: allow an empty string as a way of deleting an attribute in update (this is hacky)
-		if (update.getName() != null ) this.setName(update.getName()); 
-		if (update.getEmail() != null) this.setEmail(update.getEmail());
-		if (update.getPhotoUrl() != null) this.setPhotoUrl(update.getPhotoUrl());
+		this.setName(update.getName()); 
+		this.setEmail(update.getEmail());
+		this.setPhoneNum(update.getPhoneNum());
 	}
 	
 	/**
