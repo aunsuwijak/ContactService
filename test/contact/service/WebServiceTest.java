@@ -30,6 +30,7 @@ public class WebServiceTest {
 		serviceUrl = ContactMain.startServer( 8080 );
 		
 		serviceUrl = "http://localhost:8080/contacts";
+		
 		client = new HttpClient();
 		
 		try {

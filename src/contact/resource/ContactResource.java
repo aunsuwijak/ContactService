@@ -23,6 +23,8 @@ import contact.entity.Contact;
 import contact.service.ContactDao;
 import contact.service.DaoFactory;
 import contact.service.jpa.JpaDaoFactory;
+import contact.service.mem.MemDaoFactory;
+import contact.service.mem.MemContactDao;
 
 /**
  * ContactResource provides RESTful web resources using JAX-RS
@@ -36,7 +38,7 @@ import contact.service.jpa.JpaDaoFactory;
 @Path("/contacts")
 public class ContactResource {
 	
-	private DaoFactory mdf = new JpaDaoFactory();
+	private DaoFactory mdf = MemDaoFactory.getInstance();
 	
 	public ContactResource() {
 		
