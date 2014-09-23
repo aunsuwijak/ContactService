@@ -6,6 +6,7 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import contact.entity.Contact;
 import contact.entity.Contacts;
@@ -27,6 +28,7 @@ public class MemDaoFactory implements DaoFactory {
 	
 	private MemDaoFactory() {
 		daoInstance = new MemContactDao();
+		loadFile( "/tmp/ContactsSevicePersistence.xml" );
 	}
 	
 	public static MemDaoFactory getInstance() {
@@ -52,5 +54,30 @@ public class MemDaoFactory implements DaoFactory {
 		} catch ( JAXBException e ) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void loadFile(String path) {
+		File file = null;
+		
+		file = new File(path) ;
+			
+		JAXBContext context;
+		
+		Unmarshaller umx;
+		
+		Contacts contacts = null;
+		
+		try {
+			context = JAXBContext.newInstance( Contacts.class );
+			umx = context.createUnmarshaller();
+			contacts = (Contacts)umx.unmarshal(file);
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+		
+		List<Contact> list = contacts.getContacts();
+		
+		for ( Contact c : list )
+			daoInstance.save(c);
 	}
 }
