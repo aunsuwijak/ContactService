@@ -17,6 +17,7 @@ public class JpaDaoFactory implements DaoFactory{
 	private final EntityManagerFactory emf;
 	private EntityManager em;
 	private static Logger logger;
+	private static JpaDaoFactory factory;
 	
 	static {
 		logger = Logger.getLogger(JpaDaoFactory.class.getName());
@@ -26,6 +27,13 @@ public class JpaDaoFactory implements DaoFactory{
 		emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
 		em = emf.createEntityManager();
 		contactDao = new JpaContactDao( em );
+	}
+	
+	public static JpaDaoFactory getInstance() {
+		if ( factory == null ) {
+			factory = new JpaDaoFactory();
+		}
+		return factory;
 	}
 	
 	@Override
