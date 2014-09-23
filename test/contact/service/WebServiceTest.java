@@ -70,7 +70,7 @@ public class WebServiceTest {
 		ContentResponse response = null;
 		
 		try {
-			response = client.GET(serviceUrl + "/1234");
+			response = client.GET(serviceUrl + "/12345");
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			e.printStackTrace();
 		}
@@ -90,12 +90,15 @@ public class WebServiceTest {
 				"<phoneNum>contact's telephone number</phoneNum>"+
 				"</contact>");
 		
+		Request request = client.newRequest(serviceUrl);
+		request = request.content(content, "application/xml");
+		request = request.method(HttpMethod.POST);
+		
 		try {
-			response = client.newRequest(serviceUrl).content(content, "application/xml").method(HttpMethod.POST).send();
+			response = request.send();
 		} catch (InterruptedException | TimeoutException | ExecutionException e) {
 			e.printStackTrace();
 		}	
-		System.out.println( response.getContentAsString() );
 		
 		// Post success
 		assertEquals(Response.Status.CREATED.getStatusCode() , response.getStatus() );
@@ -117,9 +120,7 @@ public class WebServiceTest {
 		request = request.method(HttpMethod.POST);
 		
 		try {
-			request.send();
-			response = client.GET(serviceUrl + "/1234");
-			System.out.println( response.getContentAsString() );
+			response = request.send();
 		} catch (InterruptedException | TimeoutException | ExecutionException e) {
 			e.printStackTrace();
 		}
@@ -133,7 +134,7 @@ public class WebServiceTest {
 		ContentResponse response = null;
 		
 		StringContentProvider content = new StringContentProvider("<contact id=\"1234\">" +
-				"<title>contact nickname or title</title>" +
+				"<title>contact nickname</title>" +
 				"<name>contact's full name</name>" +
 				"<email>contact's email address</email>" +
 				"<phoneNum>contact's telephone number</phoneNum>"+
@@ -142,7 +143,7 @@ public class WebServiceTest {
 		
 		Request request = client.newRequest(serviceUrl + "/1234");
 		request = request.content(content, "application/xml");
-		request = request.method(HttpMethod.POST);
+		request = request.method(HttpMethod.PUT);
 		
 		try {
 			response = request.send();
@@ -158,7 +159,7 @@ public class WebServiceTest {
 	public void testPutFailed() {
 		ContentResponse response = null;
 		
-		StringContentProvider content = new StringContentProvider("<contact id=\"1234\">" +
+		StringContentProvider content = new StringContentProvider("<contact id=\"1400\">" +
 				"<title>contact nickname or title</title>" +
 				"<name>contact's full name</name>" +
 				"<email>contact's email address</email>" +
@@ -167,7 +168,7 @@ public class WebServiceTest {
 		
 		Request request = client.newRequest(serviceUrl + "/1");
 		request = request.content(content, "application/xml");
-		request = request.method(HttpMethod.POST);
+		request = request.method(HttpMethod.PUT);
 		
 		try {
 			response = request.send();
@@ -183,7 +184,7 @@ public class WebServiceTest {
 	public void testDeleteSuccess() {
 		ContentResponse response = null;
 		
-		StringContentProvider content = new StringContentProvider("<contact id=\"1234\">" +
+		StringContentProvider content = new StringContentProvider("<contact id=\"1800\">" +
 				"<title>contact nickname or title</title>" +
 				"<name>contact's full name</name>" +
 				"<email>contact's email address</email>" +
@@ -200,7 +201,7 @@ public class WebServiceTest {
 			e.printStackTrace();
 		}
 		
-		request = client.newRequest(serviceUrl + "/1234");
+		request = client.newRequest(serviceUrl + "/1800");
 		request = request.method(HttpMethod.DELETE);
 		
 		try {

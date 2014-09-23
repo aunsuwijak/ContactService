@@ -79,6 +79,9 @@ public class MemContactDao implements ContactDao{
 	 * @return true if saved successfully
 	 */
 	public boolean save(Contact contact) {
+		if ( find(contact.getId()) != null ) 
+			return false;
+		
 		if (contact.getId() == 0) {
 			contact.setId( getUniqueId() );
 			return contacts.add(contact);

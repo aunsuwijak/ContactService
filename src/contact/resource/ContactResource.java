@@ -1,5 +1,6 @@
 package contact.resource;
 
+import java.net.URI;
 import java.util.List;
 
 import javax.inject.Singleton;
@@ -92,11 +93,14 @@ public class ContactResource {
 		
 		Contact contact = element.getValue();
 		
-		System.out.println(contact);
+		if ( cd.save(contact) ) {
+			URI uri = uriInfo.getAbsolutePathBuilder().path(""+contact.getId()).build();
+			return Response.created(uri).build();
+		}
 		
-		if ( cd.save(contact) )
-			return Response.created(uriInfo.getBaseUriBuilder().path("contacts/{id}").build(contact.getId())).build();
-		return Response.status(Response.Status.CONFLICT).location(uriInfo.getRequestUri()).entity(contact).build();
+		if ( cd.find( contact.getId() ) != null )
+			return Response.status(Response.Status.CONFLICT).build();
+		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@PUT
