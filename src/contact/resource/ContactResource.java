@@ -124,20 +124,21 @@ public class ContactResource {
 		Contact contact = cd.find( Integer.parseInt(id) );
 		
 		if ( contact == null ) 
-			return Response.status(Response.Status.NOT_FOUND)
+			return Response.status( Response.Status.NOT_FOUND )
 					.build();
 			
 		EntityTag etag = new EntityTag( contact.hashCode() + "" );
 	
-		if ( match == null && noneMatch == null ) 
+		if ( match != null && noneMatch != null ) {
 			return Response.status(Response.Status.NO_CONTENT)
 					.build();	
+		}
 		else {
 			if ( match != null ) {
 				match = match.replace("\"", "");
 				if ( !match.equals( etag.getValue() ) )
 					return Response.status(Response.Status.PRECONDITION_FAILED)
-								.build();
+							.build();
 			}
 			else if ( noneMatch != null ) {
 				noneMatch = noneMatch.replace("\"", "");
