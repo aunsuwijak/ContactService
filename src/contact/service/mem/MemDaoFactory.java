@@ -28,7 +28,9 @@ public class MemDaoFactory implements DaoFactory {
 	
 	private MemDaoFactory() {
 		daoInstance = new MemContactDao();
-		loadFile( "/tmp/ContactsSevicePersistence.xml" );
+		try {
+			loadFile( "/tmp/ContactsSevicePersistence.xml" );
+		} catch (Exception e) {}
 	}
 	
 	public static MemDaoFactory getInstance() {

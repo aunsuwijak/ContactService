@@ -22,7 +22,7 @@ import contact.service.mem.MemDaoFactory;
 
 public class WebServiceTest {
 	private static String serviceUrl;
-	private DaoFactory factory;
+	private DaoFactory factory = MemDaoFactory.getInstance();
 	private HttpClient client;
 	
 	@Before
@@ -44,16 +44,12 @@ public class WebServiceTest {
 	@After
 	public void doLast( ) throws Exception {
 		ContactMain.stopServer();
+		factory.shutdown();
 	}
 	
 	@Test
 	public void testGetSuccess() {
 		ContentResponse response = null;
-		
-		factory = MemDaoFactory.getInstance();
-		ContactDao cd = factory.getContactDao();
-		
-		cd.save( new Contact("contact1", "Joe Contact", "joe@microsoft.com", "0812345678") );
 		
 		try {
 			response = client.GET(serviceUrl + "/1000");
@@ -83,7 +79,7 @@ public class WebServiceTest {
 	public void testPostSuccess() {
 		ContentResponse response = null;
 		
-		StringContentProvider content = new StringContentProvider("<contact id=\"1234\">" +
+		StringContentProvider content = new StringContentProvider("<contact>" +
 				"<title>contact nickname or title</title>" +
 				"<name>contact's full name</name>" +
 				"<email>contact's email address</email>" +

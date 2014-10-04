@@ -91,7 +91,7 @@ public class Contact implements Serializable {
 
 	@Override
 	public String toString() {
-		return String.format("[%ld] %s (%s)", id, name, title);
+		return String.format("[%d] %s (%s)", id, name, title);
 	}
 	
 	/** Two contacts are equal if they have the same id,
