@@ -30,7 +30,8 @@ public class MemDaoFactory implements DaoFactory {
 		daoInstance = new MemContactDao();
 		loadFile( "/tmp/ContactsSevicePersistence.xml" );
 	}
-	
+
+// getInstance() should be in the abstract factory and not repeated here
 	public static MemDaoFactory getInstance() {
 		if (factory == null) factory = new MemDaoFactory();
 		return factory;

@@ -28,7 +28,8 @@ public class JpaDaoFactory implements DaoFactory{
 		em = emf.createEntityManager();
 		contactDao = new JpaContactDao( em );
 	}
-	
+
+// getInstance() should be in the abstract factory and not repeated here
 	public static JpaDaoFactory getInstance() {
 		if ( factory == null ) {
 			factory = new JpaDaoFactory();

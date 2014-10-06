@@ -95,6 +95,7 @@ public class JpaContactDao implements ContactDao {
 	 */
 	@Override
 	public boolean delete(long id) {
+// Must use try - catch and rollback
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
 		Contact contact = em.find(Contact.class,id);
@@ -128,6 +129,7 @@ public class JpaContactDao implements ContactDao {
 	 */
 	@Override
 	public boolean update(Contact update) {
+// Same comment as delete()
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
 		Contact contact = em.find(Contact.class,update.getId());

@@ -38,7 +38,7 @@ import contact.service.mem.MemContactDao;
 @Singleton
 @Path("/contacts")
 public class ContactResource {
-	
+// Use DaoFactory not MemDaoFactory	
 	private DaoFactory mdf = MemDaoFactory.getInstance();
 	
 	public ContactResource() {
@@ -71,18 +71,25 @@ public class ContactResource {
 		
 		return Response.ok(entity).build();
 	}
+
 	
+//You should declare id parameter to be "long" or use a regular expression in @Path
+// to prevent invalid requests, like GET /contacts/dog
 	@GET
 	@Path("{id}")
 	@Produces( MediaType.APPLICATION_XML )
 	public Response getContact(@PathParam("id") String id) {
 		
 		ContactDao cd = mdf.getContactDao();
-		
+// This will throw exception if id is not an integer.
+// Better to require id to be a long (as parameter), so JAX will return 
+// correct status code.
 		Contact contact = cd.find( Integer.parseInt(id) );
 
+//ERROR: should be NOT FOUND
 		if ( contact == null ) return Response.status(Response.Status.NO_CONTENT).build();
 		return Response.ok(contact).build();
+// Missing Etag
 	}
 	
 	@POST

@@ -20,6 +20,7 @@ import contact.ContactMain;
 import contact.entity.Contact;
 import contact.service.mem.MemDaoFactory;
 
+//No Javadoc. 
 public class WebServiceTest {
 	private static String serviceUrl;
 	private DaoFactory factory;
@@ -28,7 +29,8 @@ public class WebServiceTest {
 	@Before
 	public void doFirst( ) throws Exception {
 		serviceUrl = ContactMain.startServer( 8080 );
-		
+
+//Don't assume you know the URL. Get it from ContactMain.
 		serviceUrl = "http://localhost:8080/contacts";
 		
 		client = new HttpClient();
@@ -49,12 +51,12 @@ public class WebServiceTest {
 	@Test
 	public void testGetSuccess() {
 		ContentResponse response = null;
-		
+// Shouldn't directly access dao here. Test through the web service interface only.
 		factory = MemDaoFactory.getInstance();
 		ContactDao cd = factory.getContactDao();
 		
 		cd.save( new Contact("contact1", "Joe Contact", "joe@microsoft.com", "0812345678") );
-		
+// this *assumes* the DAO will assign id of 1000.  Too much coupling.		
 		try {
 			response = client.GET(serviceUrl + "/1000");
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -68,13 +70,13 @@ public class WebServiceTest {
 	@Test
 	public void testGetFailed() {
 		ContentResponse response = null;
-		
+// This *assumes* the DAO doesn't have contact id 12345.		
 		try {
 			response = client.GET(serviceUrl + "/12345");
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			e.printStackTrace();
 		}
-		
+// Should be NOT_FOUND
 		// Get failed
 		assertEquals(Response.Status.NO_CONTENT.getStatusCode() , response.getStatus() );
 	}
