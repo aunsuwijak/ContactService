@@ -9,7 +9,7 @@ import javax.persistence.Persistence;
 import contact.service.ContactDao;
 import contact.service.DaoFactory;
 
-public class JpaDaoFactory implements DaoFactory{
+public class JpaDaoFactory extends DaoFactory{
 
 	private static final String PERSISTENCE_UNIT = "contacts";
 	/** instance of the entity DAO */
@@ -27,13 +27,6 @@ public class JpaDaoFactory implements DaoFactory{
 		emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
 		em = emf.createEntityManager();
 		contactDao = new JpaContactDao( em );
-	}
-	
-	public static JpaDaoFactory getInstance() {
-		if ( factory == null ) {
-			factory = new JpaDaoFactory();
-		}
-		return factory;
 	}
 	
 	@Override

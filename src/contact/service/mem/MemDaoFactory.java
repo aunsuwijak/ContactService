@@ -21,21 +21,14 @@ import contact.service.DaoFactory;
  * 
  * @author jim
  */
-public class MemDaoFactory implements DaoFactory {
-	// singleton instance of this factory
-	private static MemDaoFactory factory;
+public class MemDaoFactory extends DaoFactory {
 	private MemContactDao daoInstance;
 	
-	private MemDaoFactory() {
+	public MemDaoFactory() {
 		daoInstance = new MemContactDao();
 		try {
 			loadFile( "/tmp/ContactsSevicePersistence.xml" );
 		} catch (Exception e) {}
-	}
-	
-	public static MemDaoFactory getInstance() {
-		if (factory == null) factory = new MemDaoFactory();
-		return factory;
 	}
 	
 	public MemContactDao getContactDao() {

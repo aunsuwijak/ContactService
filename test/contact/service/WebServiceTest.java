@@ -13,24 +13,30 @@ import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.util.StringContentProvider;
 import org.eclipse.jetty.http.HttpMethod;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import contact.ContactMain;
-import contact.entity.Contact;
-import contact.service.mem.MemDaoFactory;
-
+/**
+ * Web service test - test ContactDao through HTTP request.
+ * 
+ * @author Suwijak Chaipipat
+ * @version 7.10.2014
+ */
 public class WebServiceTest {
 	private static String serviceUrl;
-	private DaoFactory factory = MemDaoFactory.getInstance();
 	private HttpClient client;
 	
-	@Before
-	public void doFirst( ) throws Exception {
+	@BeforeClass
+	public static void doFirst( ) throws Exception {
 		serviceUrl = ContactMain.startServer( 8080 );
-		
-		serviceUrl = "http://localhost:8080/contacts";
-		
+		System.out.println( serviceUrl );
+	} 
+	 
+	@Before
+	public void beforeTest() {
 		client = new HttpClient();
 		
 		try {
@@ -38,13 +44,20 @@ public class WebServiceTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-	} 
-	 
+	}
+	
 	@After
-	public void doLast( ) throws Exception {
+	public void afterTest() {
+		try {
+			client.stop();
+		} catch ( Exception e ) {
+			e.printStackTrace();
+		}
+	}
+	
+	@AfterClass
+	public static void doLast( ) throws Exception {
 		ContactMain.stopServer();
-		factory.shutdown();
 	}
 	
 	@Test
@@ -65,14 +78,15 @@ public class WebServiceTest {
 	public void testGetFailed() {
 		ContentResponse response = null;
 		
+		// Assume that number of contact is less than Long.MAX_VALUE
 		try {
-			response = client.GET(serviceUrl + "/12345");
+			response = client.GET(serviceUrl + "/" + -100);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			e.printStackTrace();
 		}
 		
 		// Get failed
-		assertEquals(Response.Status.NO_CONTENT.getStatusCode() , response.getStatus() );
+		assertEquals(Response.Status.NOT_FOUND.getStatusCode() , response.getStatus() );
 	}
 	
 	@Test
@@ -121,6 +135,23 @@ public class WebServiceTest {
 			e.printStackTrace();
 		}
 		
+		content = new StringContentProvider("<contact id=\"1234\">" +
+				"<title>contact nickname or title</title>" +
+				"<name>contact's full name</name>" +
+				"<email>contact's email address</email>" +
+				"<phoneNum>contact's telephone number</phoneNum>"+
+				"</contact>");
+		
+		request = client.newRequest(serviceUrl);
+		request = request.content(content, "application/xml");
+		request = request.method(HttpMethod.POST);
+		
+		try {
+			response = request.send();
+		} catch (InterruptedException | TimeoutException | ExecutionException e) {
+			e.printStackTrace();
+		}
+		
 		// Post failed
 		assertEquals( Response.Status.CONFLICT.getStatusCode() , response.getStatus() );
 	}
@@ -155,7 +186,8 @@ public class WebServiceTest {
 	public void testPutFailed() {
 		ContentResponse response = null;
 		
-		StringContentProvider content = new StringContentProvider("<contact id=\"1400\">" +
+		
+		StringContentProvider content = new StringContentProvider("<contact id=\"" + -100 + "\">" +
 				"<title>contact nickname or title</title>" +
 				"<name>contact's full name</name>" +
 				"<email>contact's email address</email>" +
@@ -173,7 +205,7 @@ public class WebServiceTest {
 		}
 		
 		// Put failed
-		assertEquals( Response.Status.BAD_REQUEST.getStatusCode() , response.getStatus() );
+		assertEquals( Response.Status.NOT_FOUND.getStatusCode() , response.getStatus() );
 	}
 	
 	@Test
@@ -224,6 +256,6 @@ public class WebServiceTest {
 		}
 		
 		// Delete failed
-		assertEquals( Response.Status.BAD_REQUEST.getStatusCode() , response.getStatus() );
+		assertEquals( Response.Status.NOT_FOUND.getStatusCode() , response.getStatus() );
 	}
 }

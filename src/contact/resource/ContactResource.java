@@ -26,9 +26,7 @@ import javax.xml.bind.JAXBElement;
 import contact.entity.Contact;
 import contact.service.ContactDao;
 import contact.service.DaoFactory;
-import contact.service.jpa.JpaDaoFactory;
 import contact.service.mem.MemDaoFactory;
-import contact.service.mem.MemContactDao;
 
 /**
  * ContactResource provides RESTful web resources using JAX-RS
@@ -47,7 +45,8 @@ public class ContactResource {
 	private CacheControl cc;
 	
 	public ContactResource() {
-		mdf = MemDaoFactory.getInstance();
+		DaoFactory.setInstance( new MemDaoFactory() );
+		mdf = DaoFactory.getInstance();
 		cc = new CacheControl();
 		cc.setMaxAge(2345);
 		cc.setPrivate(true);
@@ -68,7 +67,7 @@ public class ContactResource {
 		
 		GenericEntity<List<Contact>> entity = new GenericEntity<List<Contact>>( contacts ) {};
 		
-		if ( contacts == null ) return Response.status(Response.Status.NO_CONTENT).build();
+		if ( contacts == null ) return Response.status(Response.Status.NOT_FOUND).build();
 		
 		return Response.ok(entity).build();
 	}
@@ -76,14 +75,13 @@ public class ContactResource {
 	@GET
 	@Path("{id}")
 	@Produces( MediaType.APPLICATION_XML )
-	public Response getContact(@HeaderParam("If-Match") String match ,
-			@HeaderParam("If-None-Match") String noneMatch , @PathParam("id") String id) {
+	public Response getContact(@PathParam("id") long id) {
 		
 		ContactDao cd = mdf.getContactDao();
 		
-		Contact contact = cd.find( Integer.parseInt(id) );
+		Contact contact = cd.find( id );
 
-		if ( contact == null ) return Response.status(Response.Status.NO_CONTENT).build();
+		if ( contact == null ) return Response.status(Response.Status.NOT_FOUND).build();
 		
 		return Response.ok(contact).build();
 	}
@@ -117,11 +115,11 @@ public class ContactResource {
 	@Path("{id}")
 	@Consumes( MediaType.APPLICATION_XML )
 	public Response putContact(@HeaderParam("If-Match") String match ,
-			@HeaderParam("If-None-Match") String noneMatch , @PathParam("id") String id , JAXBElement<Contact> element , @Context UriInfo uriInfo  ) {
+			@HeaderParam("If-None-Match") String noneMatch , @PathParam("id") long id , JAXBElement<Contact> element , @Context UriInfo uriInfo  ) {
 		
 		ContactDao cd = mdf.getContactDao();
 		
-		Contact contact = cd.find( Integer.parseInt(id) );
+		Contact contact = cd.find( id );
 		
 		if ( contact == null ) 
 			return Response.status( Response.Status.NOT_FOUND )
@@ -130,7 +128,7 @@ public class ContactResource {
 		EntityTag etag = new EntityTag( contact.hashCode() + "" );
 	
 		if ( match != null && noneMatch != null ) {
-			return Response.status(Response.Status.NO_CONTENT)
+			return Response.status(Response.Status.PRECONDITION_FAILED)
 					.build();	
 		}
 		else {
@@ -150,7 +148,7 @@ public class ContactResource {
 
 		contact = element.getValue();
 		
-		contact.setId( Integer.parseInt(id) );
+		contact.setId( id );
 			
 		if ( cd.update(contact) )
 			return Response.ok(contact).cacheControl(cc).tag(etag).build();
@@ -160,11 +158,11 @@ public class ContactResource {
 	@DELETE
 	@Path("{id}")
 	public Response putContact(@HeaderParam("If-Match") String match ,
-			@HeaderParam("If-None-Match") String noneMatch , @PathParam("id") String id){
+			@HeaderParam("If-None-Match") String noneMatch , @PathParam("id") long id){
 		
 		ContactDao cd = mdf.getContactDao();
 		
-		Contact contact = cd.find( Integer.parseInt(id) );
+		Contact contact = cd.find( id );
 		
 		if ( contact == null ) return Response.status(Response.Status.NOT_FOUND)
 				.build();
@@ -172,7 +170,7 @@ public class ContactResource {
 		EntityTag etag = new EntityTag( contact.hashCode() + "" );
 		
 		if ( match != null && noneMatch != null ) {
-			return Response.status(Response.Status.NO_CONTENT)
+			return Response.status(Response.Status.PRECONDITION_FAILED)
 					.build();	
 		}
 		else {
@@ -190,7 +188,7 @@ public class ContactResource {
 			}
 		}
 		
-		if ( cd.delete( Integer.parseInt(id) ) )
+		if ( cd.delete( id ) )
 			return Response.ok(contact).cacheControl(cc).tag(etag).build();
 		return Response.status(Response.Status.BAD_REQUEST).build();
 		

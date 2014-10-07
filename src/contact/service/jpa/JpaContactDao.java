@@ -5,7 +5,6 @@ import java.util.List;
 import contact.entity.Contact;
 import contact.service.ContactDao;
 
-import java.util.*;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -96,12 +95,15 @@ public class JpaContactDao implements ContactDao {
 	@Override
 	public boolean delete(long id) {
 		EntityTransaction tx = em.getTransaction();
-		tx.begin();
-		Contact contact = em.find(Contact.class,id);
-		em.remove(contact);
-		tx.commit();
-		return false;
-		
+		try {
+			tx.begin();
+			Contact contact = em.find(Contact.class,id);
+			em.remove(contact);
+			tx.commit();
+			return true;
+		} catch (EntityExistsException eee) {
+			return false;
+		}
 	}
 	
 	/**
@@ -129,11 +131,15 @@ public class JpaContactDao implements ContactDao {
 	@Override
 	public boolean update(Contact update) {
 		EntityTransaction tx = em.getTransaction();
+		try {
 		tx.begin();
 		Contact contact = em.find(Contact.class,update.getId());
 		contact.applyUpdate(update);
 		em.merge(contact);
 		tx.commit();
-		return false;
+		return true;
+		} catch (EntityExistsException eee) {
+			return false;
+		}
 	}
 }

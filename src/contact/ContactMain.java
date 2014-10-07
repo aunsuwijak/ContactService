@@ -42,7 +42,7 @@ public class ContactMain {
 		System.out.println("Starting Jetty server on port " + port);
 		server.start();
 		
-		return server.getURI().toString();
+		return server.getURI().toString() + "contacts";
 	}
 	
 	/* Start the server with default port. */
