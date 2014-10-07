@@ -246,7 +246,7 @@ public class WebServiceTest {
 	public void testDeleteFailed() {
 		ContentResponse response = null;
 
-		Request request = client.newRequest(serviceUrl + "/1");
+		Request request = client.newRequest(serviceUrl + "/" + -100);
 		request = request.method(HttpMethod.DELETE);
 		
 		try {

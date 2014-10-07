@@ -14,23 +14,30 @@ import org.eclipse.jetty.client.util.StringContentProvider;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import contact.ContactMain;
-import contact.service.mem.MemDaoFactory;
 
+/**
+ * ETagTest - test entity tag is working or not ?
+ * 
+ * @author Suwijak Chaipipat 5510545046
+ * @version 7.10.2014
+ */
 public class ETagTest {
 	private static String serviceUrl;
-	private DaoFactory factory = MemDaoFactory.getInstance();
 	private HttpClient client;
 	
-	@Before
-	public void doFirst( ) throws Exception {
+	@BeforeClass
+	public static void doFirst( ) throws Exception {
 		serviceUrl = ContactMain.startServer( 8080 );
-		
-		serviceUrl = "http://localhost:8080/contacts";
-		
+	} 
+	 
+	@Before
+	public void beforeTest() {
 		client = new HttpClient();
 		
 		try {
@@ -38,13 +45,20 @@ public class ETagTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-	} 
-	 
+	}
+	
 	@After
-	public void doLast( ) throws Exception {
+	public void afterTest() {
+		try {
+			client.stop();
+		} catch ( Exception e ) {
+			e.printStackTrace();
+		}
+	}
+	
+	@AfterClass
+	public static void doLast( ) throws Exception {
 		ContactMain.stopServer();
-		factory.shutdown();
 	}
 	
 	@Test
@@ -116,7 +130,7 @@ public class ETagTest {
 	
 	@Test
 	public void testPutIfMatch() {
-		StringContentProvider content = new StringContentProvider("<contact id=\"1235\">" +
+		StringContentProvider content = new StringContentProvider("<contact id=\"1300\">" +
 			"<title>contact nickname or title</title>" +
 			"<name>contact's full name</name>" +
 			"<email>contact's email address</email>" +
@@ -140,14 +154,14 @@ public class ETagTest {
 		
 		assertNotNull( etag );
 		
-		content = new StringContentProvider("<contact id=\"1235\">" +
+		content = new StringContentProvider("<contact id=\"1300\">" +
 				"<title>contact nickname or title</title>" +
 				"<name>contact's name</name>" +
 				"<email>contact's email address</email>" +
 				"<phoneNum>contact's telephone number</phoneNum>"+
 				"</contact>");
 		
-		request = client.newRequest( serviceUrl + "/1235" );
+		request = client.newRequest( serviceUrl + "/1300" );
 		request = request.header( HttpHeader.IF_MATCH , etag );
 		request = request.method( HttpMethod.PUT );
 		request = request.content( content , "application/xml" );
@@ -166,7 +180,7 @@ public class ETagTest {
 	
 	@Test
 	public void testPutIfNoneMatch() {
-		StringContentProvider content = new StringContentProvider("<contact id=\"1236\">" +
+		StringContentProvider content = new StringContentProvider("<contact id=\"1700\">" +
 			"<title>contact nickname or title</title>" +
 			"<name>contact's full name</name>" +
 			"<email>contact's email address</email>" +
@@ -190,14 +204,14 @@ public class ETagTest {
 		
 		assertNotNull( etag );
 		
-		content = new StringContentProvider("<contact id=\"1236\">" +
+		content = new StringContentProvider("<contact id=\"1700\">" +
 				"<title>contact nickname or title</title>" +
 				"<name>contact's name</name>" +
 				"<email>contact's email address</email>" +
 				"<phoneNum>contact's telephone number</phoneNum>"+
 				"</contact>");
 		
-		request = client.newRequest( serviceUrl + "/1236" );
+		request = client.newRequest( serviceUrl + "/1700" );
 		request = request.header( HttpHeader.IF_NONE_MATCH , "gregeg" );
 		request = request.method( HttpMethod.PUT );
 		request = request.content( content , "application/xml" );
